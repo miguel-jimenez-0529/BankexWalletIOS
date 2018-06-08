@@ -81,15 +81,15 @@ class SendingConfirmationController: UIViewController, Retriable {
     @IBOutlet weak var feeFullView: UIView!
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let fixedFrame = view.convert(stackView.frame, from: stackView.superview)
-        var viewHeight: CGFloat =  -fixedFrame.minY
-        if #available(iOS 11.0, *) {
-            viewHeight -= view.safeAreaInsets.bottom
-            viewHeight -= view.safeAreaInsets.top
-
-            bottomSpaceNextButtonConstraint.constant = 0
-        }
-        internalViewHeightConstraint.constant = viewHeight
+//        let fixedFrame = view.convert(stackView.frame, from: stackView.superview)
+//        var viewHeight: CGFloat =  -fixedFrame.minY
+//        if #available(iOS 11.0, *) {
+//            viewHeight -= view.safeAreaInsets.bottom
+//            viewHeight -= view.safeAreaInsets.top
+//
+//            bottomSpaceNextButtonConstraint.constant = 0
+//        }
+//        internalViewHeightConstraint.constant = viewHeight
     }
     
     override func viewWillAppear(_ animated: Bool) {
