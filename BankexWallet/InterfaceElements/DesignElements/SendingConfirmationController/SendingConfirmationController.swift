@@ -8,6 +8,7 @@
 
 import UIKit
 import web3swift
+import BigInt
 
 class SendingConfirmationController: UIViewController, Retriable {
 
@@ -18,6 +19,8 @@ class SendingConfirmationController: UIViewController, Retriable {
     @IBOutlet weak var fromAddressLabel: UILabel!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var feeLabel: UILabel!
+    @IBOutlet weak var gasPriceLabel: UILabel!
+    @IBOutlet weak var totalFeeLabel: UILabel!
     
     @IBOutlet weak var stackView: UIView!
     @IBOutlet weak var nextButtonTopConstraint: NSLayoutConstraint!
@@ -94,13 +97,30 @@ class SendingConfirmationController: UIViewController, Retriable {
         toAddressLabel.text = destinationAddress
         fromAddressLabel.text = SingleKeyServiceImplementation().selectedAddress()
         amountLabel.text = (amount ?? "") + " " + tokensService.selectedERC20Token().symbol
+        //Getting gas limit
         guard let estimatedGas = transaction?.estimateGas(options: nil).value else {
             feeLabel.text = "Not defined"
             return
         }
         let formattedAmount = Web3.Utils.formatToEthereumUnits(estimatedGas, toUnits: .wei, decimals: 1)
-
+        let web3 = WalletWeb3Factory.web3()
+        web3.addKeystoreManager(keysService.keystoreManager())
+        //Getting gas price
+        guard let gasPrice = web3.eth.getGasPrice().value else {
+            gasPriceLabel.text = "Not defined"
+            return
+        }
+        let formattedGasPrice = Web3.Utils.formatToEthereumUnits(gasPrice, toUnits: .Gwei, decimals: 1)
+        
+        //Getting total fee
+        guard let gasPriceInEth = Web3.Utils.formatToEthereumUnits(gasPrice, toUnits: .eth, decimals: 9) else { return }
+        guard let gasPriceInDouble = Double(gasPriceInEth) else { return }
+        guard let amount = amount, let amountInDouble = Double(amount) else {return}
+        let totalFee = String(amountInDouble + gasPriceInDouble)
+        
         feeLabel.text = (formattedAmount ?? "") + " Wei."
+        gasPriceLabel.text = (formattedGasPrice ?? "") + " GWei."
+        totalFeeLabel.text = totalFee + " Eth"
         nextButton.setTitle("Send " + (amountLabel.text ?? ""), for: .normal)
     }
     
